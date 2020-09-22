@@ -8,15 +8,16 @@ db = SQLAlchemy(app)
 
 # establishing the database
 class Todo(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return '<Task $r>' % self.id
 
+
 # adding new tasks to the database
-@app.route('/',methods=['POST','GET'])
+@app.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'POST':
         task_content = request.form['content']
@@ -31,7 +32,8 @@ def index():
     else:
         tasks = Todo.query.order_by(Todo.date_created).all()
         return render_template('index.html', tasks=tasks)
-        
+
+
 # deleting existing tasks from the database
 @app.route('/delete/<int:id>')
 def delete(id):
@@ -39,12 +41,13 @@ def delete(id):
     try:
         db.session.delete(task_to_delete)
         db.session.commit()
-        return redirect ('/')
+        return redirect('/')
     except:
         return 'There was a problem deleting the task'
 
+
 # updating tasks already in the database
-@app.route('/update/<int:id>', methods=['GET','POST'])
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
     task = Todo.query.get_or_404(id)
     if request.method == 'POST':
@@ -57,15 +60,17 @@ def update(id):
     else:
         return render_template('update.html', task=task)
 
+
 # deleting all tasks in the database
 @app.route('/nuke')
 def nuke():
     try:
         db.session.query(Todo).delete()
         db.session.commit()
-        return redirect ('/')
+        return redirect('/')
     except:
         return 'There was an issue nuking the database'
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     app.run(debug=True)
